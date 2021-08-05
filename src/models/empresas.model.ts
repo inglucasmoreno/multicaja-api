@@ -19,13 +19,12 @@ const empresaSchema = new Schema({
     },
     cuit: {
         type: String,
-        unique: true,
-        required: true,
-        trim: true
+        trim: true,
+        uppercase: true,
+        default: 'SIN CUIT'
     },
     direccion:{
         type: String,
-        unique: true,
         uppercase: true,
         default: 'SIN DIRECCION'
     },

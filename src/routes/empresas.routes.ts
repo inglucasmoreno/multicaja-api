@@ -15,8 +15,7 @@ router.get('/', validaciones.jwt, EmpresaController.listarEmpresas);
 // Nueva empresa
 router.post('/', [
     validaciones.jwt,
-    check('razon_social', 'La razon social es obligatoria').not().isEmpty(),
-    check('cuit', 'El CUIT es obligatorio').not().isEmpty(),
+    check('razon_social', 'La razon social es obligatoria').not().isEmpty()
 ], EmpresaController.nuevaEmpresa);
 
 // Actualizar empresa

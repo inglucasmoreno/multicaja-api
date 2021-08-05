@@ -9,13 +9,17 @@ class Empresa {
     // Nueva empresa
     public async nuevaEmpresa(req: Request, res: Response){
         try{
+            
+            const data: any = {};
+            const {razon_social, cuit, telefono, direccion} = req.body;
 
-            // La empresa a crear ya existe?
-            const empresaExiste = await EmpresaModel.findOne({ cuit: req.body.cuit });
-            if(empresaExiste) return respuesta.error(res, 400, 'El CUIT ya se encuentra registrado');  
+            data.razon_social = razon_social;
+            cuit.trim() !== '' ? data.cuit = cuit : null;
+            telefono.trim() !== '' ? data.telefono = telefono : null;
+            direccion.trim() !== '' ? data.direccion = direccion : null;
 
             // Creacion de nueva empresa y respuesta
-            const nuevaEmpresa = new EmpresaModel(req.body);
+            const nuevaEmpresa = new EmpresaModel(data);
             const empresa = await nuevaEmpresa.save();
             respuesta.success(res, { empresa });
      
@@ -81,8 +85,8 @@ class Empresa {
             if(!empresaExiste) return respuesta.error(res, 400, 'La empresa no existe');
       
             // El nuevo CUIT ya esta registrado?
-            const cuitExiste = await EmpresaModel.findOne({ cuit: req.body.cuit });
-            if(cuitExiste) return respuesta.error(res, 400, 'El cuit ya esta registrado')
+            // const cuitExiste = await EmpresaModel.findOne({ cuit: req.body.cuit });
+            // if(cuitExiste) return respuesta.error(res, 400, 'El cuit ya esta registrado')
 
             // Actualizacion y Respuesta
             const empresa = await EmpresaModel.findByIdAndUpdate(id, req.body, { new: true });
