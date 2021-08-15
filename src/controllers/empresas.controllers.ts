@@ -3,6 +3,7 @@ import chalk from 'chalk';
 
 import { respuesta } from '../helpers/response';
 import EmpresaModel, { I_Empresa } from '../models/empresas.model';
+import SaldoModel, { I_Saldo } from '../models/saldos.models';
 
 class Empresa {
     
@@ -19,8 +20,8 @@ class Empresa {
             direccion.trim() !== '' ? data.direccion = direccion : null;
 
             // Creacion de nueva empresa y respuesta
-            const nuevaEmpresa = new EmpresaModel(data);
-            const empresa = await nuevaEmpresa.save();
+            const nuevaEmpresa: I_Empresa = new EmpresaModel(data);
+            const empresa: I_Empresa = await nuevaEmpresa.save();
             respuesta.success(res, { empresa });
      
         }catch(err){
@@ -36,11 +37,11 @@ class Empresa {
             const id = req.params.id;
             
             // Existe la empresa a actualizar?
-            const empresaExiste = await EmpresaModel.findById(id);
+            const empresaExiste: I_Empresa = await EmpresaModel.findById(id);
             if(!empresaExiste) return respuesta.error(res, 400, 'La empresa no existe');
             
             // Creacion de empresa y generacion de respuesta
-            const empresa = await EmpresaModel.findById(id);
+            const empresa: I_Empresa = await EmpresaModel.findById(id);
             respuesta.success(res, { empresa });
         
         }catch(err){
@@ -81,7 +82,7 @@ class Empresa {
             const id = req.params.id;
             
             // Existe la empresa a actualizar?
-            const empresaExiste = await EmpresaModel.findById(id);
+            const empresaExiste: I_Empresa = await EmpresaModel.findById(id);
             if(!empresaExiste) return respuesta.error(res, 400, 'La empresa no existe');
       
             // El nuevo CUIT ya esta registrado?
@@ -89,7 +90,7 @@ class Empresa {
             // if(cuitExiste) return respuesta.error(res, 400, 'El cuit ya esta registrado')
 
             // Actualizacion y Respuesta
-            const empresa = await EmpresaModel.findByIdAndUpdate(id, req.body, { new: true });
+            const empresa: I_Empresa = await EmpresaModel.findByIdAndUpdate(id, req.body, { new: true });
             respuesta.success(res, { empresa });
         
         }catch(err){
@@ -97,6 +98,73 @@ class Empresa {
             respuesta.error(res, 500);
         }   
     }
+
+    // --------- SALDOS DE EMPRESAS --------
+    
+    // Saldo por ID
+    public async getSaldo(req: Request, res: Response){
+        try{
+            const id = req.params.id;
+            const saldo: I_Saldo = await SaldoModel.findById(id);
+            respuesta.success(res, { saldo });
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        } 
+    }    
+
+    // Listar saldos por ID de empresa
+    public async listarSaldos(req: Request, res: Response){
+        try{
+            const empresa = req.params.empresa;
+        
+            // Recepcion de parametros
+            const { columna, direccion } = req.query;
+
+            // Ordenar
+            let ordenar = [columna || 'descripcion', direccion || 1];
+
+            // Ejecucion de consulta
+            const [saldos, total] = await Promise.all([
+                SaldoModel.find({ empresa }).sort([ordenar]),
+                SaldoModel.find({ empresa }).countDocuments()                
+            ]); 
+            
+            // Respuesta
+            respuesta.success(res, { saldos, total });
+
+
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        } 
+    }  
+    
+
+    // Nuevo saldo
+    public async nuevoSaldo(req: Request, res: Response){
+        try{
+            const saldo: I_Saldo = new SaldoModel(req.body);
+            await saldo.save();
+            respuesta.success(res, { saldo });
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        } 
+    }
+
+    // Actualizar saldo
+    public async actualizarSaldo(req: Request, res: Response){
+        try{
+            const id = req.params.id;
+            const saldo: I_Saldo = await SaldoModel.findByIdAndUpdate(id, req.body, { new: true });
+            respuesta.success(res, { saldo });
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        } 
+    }
+    
 
 }
 

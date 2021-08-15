@@ -15,6 +15,8 @@ import { db } from './database/config';
 import UsuariosRoutes from './routes/usuarios.routes';
 import AuthRoutes from './routes/auth.routes';
 import EmpresasRoutes from './routes/empresas.routes';
+import ExternosRoutes from './routes/externos.routes';
+
 
 // [Express]
 const app = express();
@@ -30,6 +32,7 @@ db.connection();
 app.use('/api/usuarios', UsuariosRoutes);
 app.use('/api/auth', AuthRoutes);
 app.use('/api/empresas', EmpresasRoutes);
+app.use('/api/externos', ExternosRoutes);
 
 // [Necesario para no perder las rutas en produccion]
 app.get('*', (req, res) => {
