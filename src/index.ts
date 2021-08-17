@@ -16,7 +16,7 @@ import UsuariosRoutes from './routes/usuarios.routes';
 import AuthRoutes from './routes/auth.routes';
 import EmpresasRoutes from './routes/empresas.routes';
 import ExternosRoutes from './routes/externos.routes';
-
+import MovimientosRoutes from './routes/movimientos.routes';
 
 // [Express]
 const app = express();
@@ -33,6 +33,7 @@ app.use('/api/usuarios', UsuariosRoutes);
 app.use('/api/auth', AuthRoutes);
 app.use('/api/empresas', EmpresasRoutes);
 app.use('/api/externos', ExternosRoutes);
+app.use('/api/movimientos', MovimientosRoutes);
 
 // [Necesario para no perder las rutas en produccion]
 app.get('*', (req, res) => {

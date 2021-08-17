@@ -13,6 +13,7 @@ const saldoSchema = new Schema({
     
     empresa: {
         type: Schema.Types.ObjectId,
+        ref: 'empresa',
         required : 'La empresa es un campo obligatorio'
     },
 
