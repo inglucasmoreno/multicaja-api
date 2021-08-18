@@ -19,6 +19,8 @@ class Movimiento {
                     data.origen = data.origen_saldo;
                     const saldo = await SaldosModel.findById(data.origen_saldo).populate('empresa');
                     data.origen_descripcion = saldo.empresa.razon_social + ' - ' + saldo.descripcion;
+                    const nuevoMonto = saldo.monto - data.monto;
+                    await SaldosModel.findByIdAndUpdate(data.origen_saldo, {monto: nuevoMonto}, {new: true});
                 }else{                                     // Origen - Externo
                     const externo = await ExternosModel.findById(data.origen);
                     data.origen_descripcion = externo.descripcion;
@@ -29,6 +31,7 @@ class Movimiento {
                     data.destino = data.destino_saldo;
                     const saldo = await SaldosModel.findById(data.destino_saldo).populate('empresa');
                     data.destino_descripcion = saldo.empresa.razon_social + ' - ' + saldo.descripcion;
+                    await SaldosModel.findByIdAndUpdate(data.destino_saldo, { $inc: { monto: data.monto }  }, {new: true});
                 }else{                                      // Destino - Externo
                     const externo: I_Externo = await ExternosModel.findById(data.destino);
                     data.destino_descripcion = externo.descripcion;
