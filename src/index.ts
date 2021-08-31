@@ -17,6 +17,7 @@ import AuthRoutes from './routes/auth.routes';
 import EmpresasRoutes from './routes/empresas.routes';
 import ExternosRoutes from './routes/externos.routes';
 import MovimientosRoutes from './routes/movimientos.routes';
+import TipoMovimientoRoutes from './routes/tipo_movimiento.routes';
 
 // [Express]
 const app = express();
@@ -34,15 +35,16 @@ app.use('/api/auth', AuthRoutes);
 app.use('/api/empresas', EmpresasRoutes);
 app.use('/api/externos', ExternosRoutes);
 app.use('/api/movimientos', MovimientosRoutes);
+app.use('/api/tipo-movimientos',TipoMovimientoRoutes); 
 
 // [Necesario para no perder las rutas en produccion]
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'public/index.html'))
+    res.sendFile(path.resolve(__dirname, 'public/index.html'));
 });
 
 // Ejecución de servidor
 app.listen(app.get('PORT'), () => {
     console.log(chalk.blue('[Desarrollador] - ') + 'Equinoccio Technology');
-    console.log(chalk.blue('[Express] - ') + `Servidor corriendo en http://localhost:${app.get('PORT')}`)    
+    console.log(chalk.blue('[Express] - ') + `Servidor corriendo en http://localhost:${app.get('PORT')}`);   
 });
 
