@@ -2,7 +2,6 @@ import mongoose, { Schema, model } from 'mongoose';
 
 // Interfaz - Movimiento
 export interface I_Movimiento extends mongoose.Document {
-    descripcion: String,
     monto: Number,
     tipo_origen: String,
     tipo_destino: String,
@@ -15,11 +14,6 @@ export interface I_Movimiento extends mongoose.Document {
 
 // Modelo - Movimiento
 const movimientoSchema = new Schema({
-    descripcion: {
-        type: String,
-        uppercase: true,
-        required : 'La descripcion es un campo obligatorio'
-    },
     monto: {
         type: Number,
         required: 'El monto es un campo obligatorio'

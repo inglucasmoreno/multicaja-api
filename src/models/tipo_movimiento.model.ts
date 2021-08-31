@@ -21,6 +21,6 @@ const tipoMovimientoSchema = new Schema({
         default: true
     }
 
-}, { timestamps: true, collection: 'movimiento' } );
+}, { timestamps: true, collection: 'tipo_movimiento' } );
 
 export default model('tipo_movimiento', tipoMovimientoSchema);
