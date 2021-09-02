@@ -4,8 +4,9 @@ import mongoose, { Schema, model } from 'mongoose';
 export interface I_Cheque extends mongoose.Document {
     nro_cheque: String,
     concepto: String,
-    emisor: Schema.Types.ObjectId,
-    cliente: String,
+    emisor: String,
+    cuit: String,
+    cliente: Schema.Types.ObjectId,
     destino: Schema.Types.ObjectId,
     importe: Number,
     activo: Boolean
@@ -28,15 +29,22 @@ const chequeSchema = new Schema({
     },
 
     emisor: {
-        type: Schema.Types.ObjectId,
-        required: true,
+        type: String,
         trim: true,
+        uppercase: true,
+        default: 'SIN DATO'
+    },
+
+    cuit: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        default: 'SIN DATO'
     },
 
     cliente: {
-        type: String,
-        trim: true,
-        uppercase: true
+        type: Schema.Types.ObjectId,
+        required: true,
     },
 
     destino: {
