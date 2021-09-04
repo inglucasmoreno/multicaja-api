@@ -6,6 +6,10 @@ import { MovimientoController } from '../controllers/movimientos.controllers';
 
 const router = Router();
 
+// Movimiento por ID
+// GET - http://localhost:3000/api/movimientos/:id
+router.get('/:id', validaciones.jwt, MovimientoController.getMovimiento);
+
 // Nuevo movimiento
 // POST - http://localhost:3000/api/movimientos
 router.post('/', validaciones.jwt, MovimientoController.nuevoMovimiento);
