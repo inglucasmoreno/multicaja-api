@@ -3,6 +3,7 @@ import chalk from 'chalk';
 
 import { respuesta } from '../helpers/response';
 import ChequeModel, { I_Cheque } from '../models/cheque.model';
+import mongoose from 'mongoose';
 
 class Cheque {
 
@@ -30,23 +31,42 @@ class Cheque {
         } 
     }
 
-    // Listar cheques
-    public async listarCheques(req: Request, res: Response){
+    // Listar cheques por Empresa
+    public async listarChequesPorEmpresa(req: Request, res: Response){
         try{
+            
             // Recepcion de parametros
             const { columna, direccion } = req.query;
+            const id = req.params.id;
 
-            // Ordenar
-            let ordenar = [columna || 'descripcion', direccion || 1];
+            const pipeline = [];
+            
+            pipeline.push({ $match: { } });
+                
+            // Filtrado por activo/inactivo
+            if(req.query.activo !== ''){
+                if(req.query.activo === 'true'){
+                    pipeline.push({ $match: { activo: true }});
+                }else{
+                    pipeline.push({ $match: { activo: false }});
+                }
+            }
 
-            // Ejecucion de consulta
-            const [cheques, total] = await Promise.all([
-                ChequeModel.find().sort([ordenar]),
-                ChequeModel.find().countDocuments()                
-            ]); 
+            // Filtrado por empresa
+            pipeline.push({ $match: { destino: mongoose.Types.ObjectId(id) }});
+
+            // Ordenando datos
+            const ordenar: any = {};
+            if(req.query.columna){
+                ordenar[String(columna)] = Number(direccion); 
+                pipeline.push({$sort: ordenar});
+            } 
+            
+            const cheques = await ChequeModel.aggregate(pipeline);
              
             // Respuesta
-            respuesta.success(res, { cheques, total });
+            respuesta.success(res, { cheques });
+
         }catch(error){
             console.log(chalk.red(error));
             respuesta.error(res, 500);

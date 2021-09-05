@@ -8,6 +8,8 @@ export interface I_Cheque extends mongoose.Document {
     cuit: String,
     cliente: Schema.Types.ObjectId,
     destino: Schema.Types.ObjectId,
+    cliente_descripcion: String,
+    destino_descripcion: String,
     importe: Number,
     activo: Boolean
 }
@@ -47,9 +49,19 @@ const chequeSchema = new Schema({
         required: true,
     },
 
+    cliente_descripcion: {
+        type: String,
+        required: 'La descripcion del cliente es obligatorio',
+    },
+
     destino: {
         type: Schema.Types.ObjectId,
         required: true,
+    },
+
+    destino_descripcion: {
+        type: String,
+        required: 'La descripcion del destino es obligatorio',
     },
 
     importe: {

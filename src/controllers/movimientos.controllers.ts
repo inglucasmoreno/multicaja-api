@@ -124,8 +124,6 @@ class Movimiento {
                     data.destino_saldo_descripcion = null;
                 }
                 
-                console.log(data);
-
                 const movimiento = new MovimientosModel(data);
                 await movimiento.save();
 
@@ -140,9 +138,6 @@ class Movimiento {
         // Listar movimientos
         public async listarMovimientos(req: any, res: Response){
             try{
-                
-                // Recepcion de parametros
-                const { columna, direccion } = req.query;
     
                 const pipeline = [];
 

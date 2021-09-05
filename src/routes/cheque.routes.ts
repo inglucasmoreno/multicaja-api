@@ -11,8 +11,8 @@ const router = Router();
 router.get('/:id', validaciones.jwt, ChequeController.getCheque);
 
 // Listar cheques
-// GET - http://localhost:3000/api/cheques
-router.get('/', validaciones.jwt, ChequeController.listarCheques);
+// GET - http://localhost:3000/api/cheques/:id
+router.get('/cartera/:id', validaciones.jwt, ChequeController.listarChequesPorEmpresa);
 
 // Nuevo cheque
 // POST - http://localhost:3000/api/cheques
