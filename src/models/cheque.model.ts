@@ -5,6 +5,7 @@ import { isNonNullChain } from 'typescript';
 export interface I_Cheque extends mongoose.Document {
     nro_cheque: String,
     concepto: String,
+    banco: String,
     emisor: String,
     cuit: String,
     cliente: Schema.Types.ObjectId,
@@ -14,6 +15,9 @@ export interface I_Cheque extends mongoose.Document {
     transferencia_destino_descripcion: String,
     transferencia_destino: String,
     importe: Number,
+    fecha_emision: Date,
+    fecha_cobro: Date,
+    fecha_transferenca: Date,
     estado: String,
     activo: Boolean
 }
@@ -28,6 +32,13 @@ const chequeSchema = new Schema({
     },
 
     concepto: {
+        type: String,
+        required: true,
+        trim: true,
+        uppercase: true
+    },
+
+    banco: {
         type: String,
         required: true,
         trim: true,
@@ -81,6 +92,21 @@ const chequeSchema = new Schema({
     importe: {
         type: Number,
         required: true,
+    },
+
+    fecha_emision: {
+        type: Date,
+        default: Date.now()
+    },
+
+    fecha_cobro: {
+        type: Date,
+        default: Date.now()
+    },
+
+    fecha_transferencia: {
+        type: Date,
+        default: Date.now()
     },
     
     estado: {

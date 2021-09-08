@@ -7,6 +7,7 @@ import ExternoModel from '../models/externos.model';
 import SaldoModel from '../models/saldos.models';
 import MovimientoModel from '../models/movimientos.model';
 
+import { add } from 'date-fns';
 
 import mongoose from 'mongoose';
 
@@ -30,6 +31,9 @@ class Cheque {
             
             const { cheque, movimiento } = req.body;
             
+            // AJUSTE DE FECHAS
+            cheque.fecha_emision = add(new Date(cheque.fecha_emision),{hours: 3});      
+
             // DATOS DE CLIENTE
             const cliente = await ExternoModel.findById(cheque.cliente);
             

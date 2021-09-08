@@ -7,6 +7,7 @@ import ExternosModel, { I_Externo } from '../models/externos.model';
 import SaldosModel from '../models/saldos.models';
 import EmpresaModel from '../models/empresas.model';
 import mongoose from 'mongoose';
+import { add } from 'date-fns';
 
 class Movimiento {
 
@@ -180,9 +181,12 @@ class Movimiento {
         public async cobrarCheque(req: Request, res: Response){
             try{
                 
-                const { cheque, origen_saldo, destino_saldo } = req.body;
+                const { cheque, origen_saldo, destino_saldo, fecha_cobro } = req.body;
                 let data:any = req.body;
                 
+                // AJUSTE DE FECHAS
+                const fecha_cobro_adaptada = add(new Date(fecha_cobro),{hours: 3});    
+
                 // SE BUSCA LA DESCRIPCION DE SALDO
                 const saldoDB = await SaldosModel.findById(destino_saldo);
                 data.destino_saldo_descripcion = saldoDB.descripcion;
@@ -201,7 +205,7 @@ class Movimiento {
                 await SaldosModel.findByIdAndUpdate(destino_saldo, { monto: data.destino_monto_nuevo });
 
                 // ACTUALIZACION DE ESTADO DE CHEQUE
-                await ChequeModel.findByIdAndUpdate(cheque, { estado: 'Cobrado', activo: false });
+                await ChequeModel.findByIdAndUpdate(cheque, { estado: 'Cobrado', fecha_cobro: fecha_cobro_adaptada, activo: false });
 
                 // SE CREA EL NUEVO MOVIMIENTO
                 const nuevoMovimiento = new MovimientosModel(data);
@@ -220,11 +224,13 @@ class Movimiento {
         public async transferirCheque(req: Request, res: Response){
             try{
 
-                const { cheque, origen_saldo, tipo_destino, concepto, destino } = req.body;
+                const { cheque, origen_saldo, tipo_destino, concepto, destino, fecha_transferencia } = req.body;
                 
-                let data:any = req.body;
-                                
+                let data:any = req.body;                
                 let destinoDB: any = {};
+
+                // AJUSTE DE FECHAS
+                data.fecha_transferencia = add(new Date(fecha_transferencia),{hours: 3});   
 
                 // SE OBTIENE LA DESCRIPCION DEL DESTINO
                 if(tipo_destino === 'Interno'){
@@ -268,6 +274,7 @@ class Movimiento {
                     estado: 'Transferido', 
                     transferencia_destino_descripcion: data.destino_descripcion, 
                     transferencia_destino: data.destino,
+                    fecha_transferencia: data.fecha_transferencia,
                     activo: false });
                 
                 // SE CREA UN NUEVO CHEQUE SI ES NECESARIO
@@ -275,6 +282,8 @@ class Movimiento {
                     const dataCheque = {
                         emisor: null,
                         cuit: null,
+                        fecha_emision: chequeAnterior.fecha_emision,
+                        banco: chequeAnterior.banco,
                         nro_cheque: chequeAnterior.nro_cheque,
                         estado: 'Activo',
                         activo: true,
