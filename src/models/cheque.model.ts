@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from 'mongoose';
+import { isNonNullChain } from 'typescript';
 
 // Interfaz - Cheque
 export interface I_Cheque extends mongoose.Document {
@@ -10,7 +11,10 @@ export interface I_Cheque extends mongoose.Document {
     destino: Schema.Types.ObjectId,
     cliente_descripcion: String,
     destino_descripcion: String,
+    transferencia_destino_descripcion: String,
+    transferencia_destino: String,
     importe: Number,
+    estado: String,
     activo: Boolean
 }
 
@@ -64,11 +68,26 @@ const chequeSchema = new Schema({
         required: 'La descripcion del destino es obligatorio',
     },
 
+    transferencia_destino_descripcion: {
+        type: String,
+        default: null
+    },
+
+    transferencia_destino: {
+        type: String,
+        default: null
+    },
+
     importe: {
         type: Number,
         required: true,
     },
     
+    estado: {
+        type: String,
+        default: 'Activo'
+    },
+
     activo: {
         type: Boolean,
         default: true

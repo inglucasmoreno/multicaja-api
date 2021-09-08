@@ -3,6 +3,7 @@ import mongoose, { Schema, model } from 'mongoose';
 // Interfaz - Movimiento
 export interface I_Movimiento extends mongoose.Document {
     monto: Number,
+    cheque: String,
     tipo_origen: String,
     tipo_destino: String,
     tipo_movimiento: Schema.Types.ObjectId,
@@ -26,6 +27,10 @@ const movimientoSchema = new Schema({
     monto: {
         type: Number,
         required: 'El monto es un campo obligatorio'
+    },
+    cheque: {
+        type: String,
+        default: null
     },
     tipo_origen: {
         type: String,

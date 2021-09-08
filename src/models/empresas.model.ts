@@ -6,6 +6,10 @@ export interface I_Empresa extends mongoose.Document {
     cuit: String,
     direccion: String,
     telefono: String,
+    saldos_especiales: {
+        caja: String,
+        cheques: String
+    }
     activo: Boolean
 }
 
@@ -33,6 +37,16 @@ const empresaSchema = new Schema({
         trim: true,
         uppercase: true,
         default: 'SIN TELEFONO'
+    },
+    saldos_especiales: {
+        caja: {
+            type: String,
+            default: null
+        },
+        cheques: {
+            type: String,
+            default: null
+        }
     },
     activo: {
         type: Boolean,

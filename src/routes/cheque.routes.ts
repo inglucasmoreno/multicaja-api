@@ -18,8 +18,13 @@ router.get('/cartera/:id', validaciones.jwt, ChequeController.listarChequesPorEm
 // POST - http://localhost:3000/api/cheques
 router.post('/', [
     validaciones.jwt,
-    check('descripcion', 'La descripcion es obligatoria').not().isEmpty(),
 ], ChequeController.nuevoCheque);
+
+// Nuevo cheque desde cartera
+// POST - http://localhost:3000/api/cheques/crear
+router.post('/crear', [
+    validaciones.jwt,
+], ChequeController.nuevoChequeDesdeCartera);
 
 // Actualizar cheque
 // PUT - http://localhost:3000/api/cheques/:id

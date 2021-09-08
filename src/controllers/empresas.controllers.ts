@@ -18,11 +18,26 @@ class Empresa {
             cuit.trim() !== '' ? data.cuit = cuit : null;
             telefono.trim() !== '' ? data.telefono = telefono : null;
             direccion.trim() !== '' ? data.direccion = direccion : null;
+            
+            console.log(data);
 
-            // Creacion de nueva empresa y respuesta
+            // Creacion de nueva empresa
+            data.saldos_especiales = { caja: null, cheques: null }
+            
             const nuevaEmpresa: I_Empresa = new EmpresaModel(data);
             const empresa: I_Empresa = await nuevaEmpresa.save();
-            respuesta.success(res, { empresa });
+            
+            // Creacion de tipos especiales (CAJA y CHEQUE)
+            let nuevoSaldo = new SaldoModel({ descripcion: 'CAJA', monto: 0, empresa: empresa._id});
+            const caja = await nuevoSaldo.save();
+
+            nuevoSaldo = new SaldoModel({ descripcion: 'CHEQUES', monto: 0, empresa: empresa._id});
+            const cheque = await nuevoSaldo.save();
+
+            // Se le agegran los tipos especiales a la empresa
+            const empresaFinal = await EmpresaModel.findByIdAndUpdate(empresa._id, { saldos_especiales: { caja: caja._id, cheques: cheque._id } })
+
+            respuesta.success(res, { empresa: empresaFinal });
      
         }catch(err){
             console.log(chalk.red(err));
