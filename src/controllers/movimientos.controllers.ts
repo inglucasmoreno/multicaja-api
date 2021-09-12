@@ -181,11 +181,12 @@ class Movimiento {
         public async cobrarCheque(req: Request, res: Response){
             try{
                 
-                const { cheque, origen_saldo, destino_saldo, fecha_cobro } = req.body;
-                let data:any = req.body;
-                
-                // AJUSTE DE FECHAS
-                const fecha_cobro_adaptada = add(new Date(fecha_cobro),{hours: 3});    
+                const { cheque, origen_saldo, destino_saldo, fecha_cobrado } = req.body;
+
+                // FECHAS
+                const fecha_cobrado_adaptada = add(new Date(fecha_cobrado),{hours: 3});
+
+                let data:any = req.body; 
 
                 // SE BUSCA LA DESCRIPCION DE SALDO
                 const saldoDB = await SaldosModel.findById(destino_saldo);
@@ -205,7 +206,7 @@ class Movimiento {
                 await SaldosModel.findByIdAndUpdate(destino_saldo, { monto: data.destino_monto_nuevo });
 
                 // ACTUALIZACION DE ESTADO DE CHEQUE
-                await ChequeModel.findByIdAndUpdate(cheque, { estado: 'Cobrado', fecha_cobro: fecha_cobro_adaptada, activo: false });
+                await ChequeModel.findByIdAndUpdate(cheque, { fecha_cobrado: fecha_cobrado_adaptada, estado: 'Cobrado', activo: false });
 
                 // SE CREA EL NUEVO MOVIMIENTO
                 const nuevoMovimiento = new MovimientosModel(data);
@@ -280,9 +281,10 @@ class Movimiento {
                 // SE CREA UN NUEVO CHEQUE SI ES NECESARIO
                 if(tipo_destino === 'Interno'){
                     const dataCheque = {
-                        emisor: null,
-                        cuit: null,
+                        emisor: chequeAnterior.emisor,
+                        cuit: chequeAnterior.cuit,
                         fecha_emision: chequeAnterior.fecha_emision,
+                        fecha_cobro: chequeAnterior.fecha_cobro,
                         banco: chequeAnterior.banco,
                         nro_cheque: chequeAnterior.nro_cheque,
                         estado: 'Activo',

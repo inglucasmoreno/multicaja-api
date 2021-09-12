@@ -23,21 +23,21 @@ const externoSchema = new Schema({
         type: String,
         trim: true,
         uppercase: true,
-        default: 'SIN TELEFONO'
+        default: ''
     },
 
     direccion: {
         type: String,
         trim: true,
         uppercase: true,
-        default: 'SIN DIRECCION'
+        default: ''
     },
     
     dni_cuit: {
         type: String,
         trim: true,
         uppercase: true,
-        default: 'SIN IDENTIFICACION'
+        default: ''
     },
 
     activo: {

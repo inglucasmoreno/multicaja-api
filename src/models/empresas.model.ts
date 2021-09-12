@@ -25,18 +25,18 @@ const empresaSchema = new Schema({
         type: String,
         trim: true,
         uppercase: true,
-        default: 'SIN CUIT'
+        default: ''
     },
     direccion:{
         type: String,
         uppercase: true,
-        default: 'SIN DIRECCION'
+        default: ''
     },
     telefono: {
         type: String,
         trim: true,
         uppercase: true,
-        default: 'SIN TELEFONO'
+        default: ''
     },
     saldos_especiales: {
         caja: {
