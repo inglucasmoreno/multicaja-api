@@ -6,6 +6,7 @@ import ChequeModel, { I_Cheque } from '../models/cheque.model';
 import EmpresasModel from '../models/empresas.model';
 import ExternoModel from '../models/externos.model';
 import SaldoModel from '../models/saldos.models';
+import EvolucionCajaModel from '../models/evolucion_caja.model';
 import MovimientoModel from '../models/movimientos.model';
 
 import { add } from 'date-fns';
@@ -66,7 +67,23 @@ class Cheque {
 
             // 3) - Se crea el movimiento
             const nuevoMovimiento = new MovimientoModel(movimiento);
-            await nuevoMovimiento.save();
+            const movimientoDB = await nuevoMovimiento.save();
+
+            // ----- EVOLUCION DE SALDO -----
+            
+            const dataEvolucion = {
+                empresa: movimiento.destino,
+                empresa_descripcion: movimiento.destino_descripcion,
+                saldo: movimiento.destino_saldo,
+                saldo_descripcion: movimiento.destino_saldo_descripcion,
+                monto_anterior: movimiento.destino_monto_anterior,
+                monto_actual: movimiento.destino_monto_nuevo,
+                movimiento: movimientoDB._id 
+            }
+
+            const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+            await nuevaEvolucion.save();
+
 
             respuesta.success(res, 'Todo correcto');
         
@@ -91,7 +108,8 @@ class Cheque {
 
             // BANCO (SALDO) - DESCRIPCION
             const saldo = await SaldoModel.findById(cheque.banco_id);
-            cheque.banco = saldo.descripcion; 
+            cheque.banco = saldo.descripcion;
+            movimiento.origen_saldo_descripcion = saldo.descripcion; 
 
             let destinoDB: any = {};
 
@@ -144,7 +162,24 @@ class Cheque {
             
             // CREAR MOVIMIENTO
             const nuevoMovimiento = new MovimientoModel(movimiento);
-            await nuevoMovimiento.save();
+            const movimientoDB = await nuevoMovimiento.save();
+            
+            // EVOLUCION DE SALDO
+            
+            // Destino
+            const dataEvolucion = {
+                empresa: movimiento.destino,
+                empresa_descripcion: movimiento.destino_descripcion,
+                saldo: movimiento.destino_saldo,
+                saldo_descripcion: movimiento.destino_saldo_descripcion,
+                monto_anterior: movimiento.destino_monto_anterior,
+                monto_actual: movimiento.destino_monto_nuevo,
+                movimiento: movimientoDB._id 
+            }
+
+            const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+            await nuevaEvolucion.save();
+
 
             respuesta.success(res, 'Todo correcto');
         }catch(error){
@@ -291,12 +326,29 @@ class Cheque {
 
             await SaldoModel.findByIdAndUpdate(cheque.banco_id, { monto: nuevoMonto });
             
-            // NUEVO CHEQUE
+            // ACTUALIZACION DE CHEQUE
             await ChequeModel.findByIdAndUpdate(cheque.cheque_id, { fecha_cobrado, activo: false });
 
             // NUEVO MOVIMIENTO
             const nuevoMovimiento = new MovimientoModel(movimiento);
-            await nuevoMovimiento.save();
+            const movimientoDB = await nuevoMovimiento.save();
+
+                        
+            // EVOLUCION DE SALDO
+            
+            // Origen
+            const dataEvolucion = {
+                empresa: movimiento.destino,
+                empresa_descripcion: movimiento.destino_descripcion,
+                saldo: movimiento.destino_saldo,
+                saldo_descripcion: movimiento.destino_saldo_descripcion,
+                monto_anterior: movimiento.destino_monto_anterior,
+                monto_actual: movimiento.destino_monto_nuevo,
+                movimiento: movimientoDB._id 
+            }
+
+            const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+            await nuevaEvolucion.save();
             
             respuesta.success(res, 'Actualizacion correcta');
 

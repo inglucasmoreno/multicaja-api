@@ -4,32 +4,66 @@ import chalk from 'chalk';
 import { respuesta } from '../helpers/response';
 import MovimientoModel from '../models/movimientos.model';
 import ChequeModel from '../models/cheque.model';
+import EvolucionSaldosModel from '../models/evolucion_caja.model';
 import mongoose from 'mongoose';
+import { add } from 'date-fns';
 
 class Reportes {
 
     // Reportes de movimientos
-    public async movimientos(req: Request, res: Response) {
+    public async movimientos(req: any, res: Response) {
         try{
-            const {fechaDesde , fechaHasta, tipo_movimiento, origen, destino} = req.body;
-              
+            const {desde , hasta, tipo_movimiento, origen, destino, tipo_origen, tipo_destino} = req.body;
+            
             let pipeline = [];
 
             pipeline.push({$match: {}});
-
+            
             // Fecha de creacion de movimiento
-            if(fechaDesde) pipeline.push({ $match: { createdAt: { $gte: new Date(fechaDesde) } } });
-            if(fechaHasta) pipeline.push({ $match: { createdAt: { $lte: new Date(fechaHasta) } } });
+            if(desde !== null && desde !== '') {
+                const desdeNew = add(new Date(desde), { hours: 3 });
+                pipeline.push({ $match: { createdAt: { $gte: new Date(desdeNew) } } })
+            };
+            
+            if(hasta !== null && hasta !== ''){
+                const hastaNew = add(new Date(hasta), { days: 1, hours: 3 });
+                pipeline.push({ $match: { createdAt: { $lte: new Date(hastaNew) } } });
+            } 
 
             // Tipo de movimiento
-            if(tipo_movimiento) pipeline.push({$match: { tipo_movimiento: mongoose.Types.ObjectId(tipo_movimiento) }});     
+            if(tipo_movimiento !== null && tipo_movimiento !== '') pipeline.push({$match: { tipo_movimiento: mongoose.Types.ObjectId(tipo_movimiento) }});     
+
+            // Tipo de origen
+            if(tipo_origen !== null && tipo_origen !== '') pipeline.push({$match: { tipo_origen }});  
+            
+            // Tipo de destino
+            if(tipo_destino !== null && tipo_destino !== '') pipeline.push({$match: { tipo_destino }});  
 
             // Origen
-            if(origen) pipeline.push({$match: { origen: mongoose.Types.ObjectId(origen) }});     
+            if(origen !== null && origen !== '') pipeline.push({$match: { origen }});     
     
             // Destino
-            if(destino) pipeline.push({$match: { destino: mongoose.Types.ObjectId(destino) }});     
+            if(destino !== null && destino !== '') pipeline.push({$match: { destino }});     
             
+            // Join con "Tipo de movimientos"
+            pipeline.push(
+                { $lookup: { // Lookup - Tipo movimientos
+                    from: 'tipo_movimiento',
+                    localField: 'tipo_movimiento',
+                    foreignField: '_id',
+                    as: 'tipo_movimiento'
+                }},
+            );
+            
+            pipeline.push({ $unwind: '$tipo_movimiento' });
+
+            // Ordenando datos
+            const ordenar: any = {};
+            if(req.query.columna){
+                ordenar[req.query.columna] = Number(req.query.direccion); 
+                pipeline.push({$sort: ordenar});
+            }
+
             const movimientos = await MovimientoModel.aggregate(pipeline);
             
             respuesta.success(res, { movimientos });
@@ -43,21 +77,40 @@ class Reportes {
     public async chequesEmitidos(req: any, res: Response) {
         try{
 
-            const {cliente , destino, fechaDesde, fechaHasta} = req.body;
+            const {cliente , destino, fechaDesde, fechaHasta, tipoDestino, estado} = req.body;
 
             let pipeline = [];
             
             pipeline.push({$match: { estado: 'Emitido' }});
 
             // Fecha de emision
-            if(fechaDesde) pipeline.push({ $match: { fecha_emision: { $gte: new Date(fechaDesde) } } });
-            if(fechaHasta) pipeline.push({ $match: { fecha_emision: { $lte: new Date(fechaHasta) } } });
+            if(fechaDesde !== null && fechaDesde !== '') {
+                const fechaDesdeNew = add(new Date(fechaDesde), { hours: 3 });
+                pipeline.push({ $match: { fecha_emision: { $gte: new Date(fechaDesdeNew) } } });
+            }
+            
+            if(fechaHasta !== null && fechaHasta !== '') {
+                const fechaHastaNew = add(new Date(fechaHasta), { days: 1, hours: 3 });
+                pipeline.push({ $match: { fecha_emision: { $lte: new Date(fechaHastaNew) } } })
+            };
+
+            // Estado - Cobrado o No cobrado
+            if(estado !== ''){
+                if(estado === 'true'){
+                    pipeline.push({$match: { activo: true }});
+                }else{
+                    pipeline.push({$match: { activo: false }});
+                }
+            }    
+
+            // Tipo de destino
+            if(tipoDestino !== null && tipoDestino !== '') pipeline.push({$match: { tipo_destino: tipoDestino }});     
 
             // Cliente
-            if(cliente) pipeline.push({$match: { cliente: mongoose.Types.ObjectId(cliente) }});     
-
+            if(cliente !== null && cliente !== '') pipeline.push({$match: { cliente: mongoose.Types.ObjectId(cliente) }});     
+    
             // Destino
-            if(destino) pipeline.push({$match: { destino: mongoose.Types.ObjectId(destino) }});   
+            if(destino !== null && destino !== '') pipeline.push({$match: { destino: mongoose.Types.ObjectId(destino) }});
             
             // Ordenando datos
             const ordenar: any = {};
@@ -70,6 +123,47 @@ class Reportes {
             
             respuesta.success(res, { cheques });
 
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        }
+    }
+
+    // Reportes de evolucion de caja
+    public async evolucionSaldo(req: any, res: Response) {
+        try{
+            
+            const { fechaDesde, fechaHasta, saldo } = req.body;
+            
+            let pipeline = [];
+
+            pipeline.push({ $match: { }});
+            
+            // Filtrado por saldo
+            if(saldo !== null && saldo !== '') pipeline.push({ $match: { saldo: mongoose.Types.ObjectId(saldo) } });
+
+            // Fecha de saldo
+            if(fechaDesde !== null && fechaDesde !== '') {
+                const fechaDesdeNew = add(new Date(fechaDesde), { hours: 3 });
+                pipeline.push({ $match: { createdAt: { $gte: new Date(fechaDesdeNew) } } });
+            }
+            
+            if(fechaHasta !== null && fechaHasta !== '') {
+                const fechaHastaNew = add(new Date(fechaHasta), { days: 1, hours: 3 });
+                pipeline.push({ $match: { createdAt: { $lte: new Date(fechaHastaNew) } } })
+            };          
+    
+            // Ordenando datos
+            const ordenar: any = {};
+            if(req.query.columna){
+                ordenar[req.query.columna] = Number(req.query.direccion); 
+                pipeline.push({$sort: ordenar});
+            }
+
+            const saldos = await EvolucionSaldosModel.aggregate(pipeline);
+
+            respuesta.success(res, { saldos });
+            
         }catch(error){
             console.log(chalk.red(error));
             respuesta.error(res, 500);

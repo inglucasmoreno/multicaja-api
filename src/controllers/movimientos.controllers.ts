@@ -6,6 +6,7 @@ import ChequeModel from '../models/cheque.model';
 import ExternosModel, { I_Externo } from '../models/externos.model';
 import SaldosModel from '../models/saldos.models';
 import EmpresaModel from '../models/empresas.model';
+import EvolucionCajaModel from '../models/evolucion_caja.model';
 import mongoose from 'mongoose';
 import { add } from 'date-fns';
 
@@ -92,7 +93,7 @@ class Movimiento {
                     const nuevoSaldo = await SaldosModel.findByIdAndUpdate(data.origen_saldo, {monto: nuevoMonto}, {new: true});
                     
                     data.origen_monto_nuevo = nuevoSaldo.monto;
-                
+
                 }else{                                     // Origen - Externo
                     const externo = await ExternosModel.findById(data.origen);
                     data.origen_descripcion = externo.descripcion;
@@ -127,7 +128,43 @@ class Movimiento {
                 }
                 
                 const movimiento = new MovimientosModel(data);
-                await movimiento.save();
+                const movimientoDB = await movimiento.save();
+
+                // ----- EVOLUCION DE SALDO -----
+                
+                // Origen
+                if(req.body.tipo_origen === 'Interno'){
+                    const dataEvolucion = {
+                        empresa: data.origen,
+                        empresa_descripcion: data.origen_descripcion,
+                        saldo: data.origen_saldo,
+                        saldo_descripcion: data.origen_saldo_descripcion,
+                        monto_anterior: data.origen_monto_anterior,
+                        monto_actual: data.origen_monto_nuevo,
+                        movimiento: movimientoDB._id 
+                    }
+    
+                    const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+                    await nuevaEvolucion.save();
+    
+                }
+                
+                // Destino
+                if(req.body.tipo_destino === 'Interno'){
+                    const dataEvolucion = {
+                        empresa: data.destino,
+                        empresa_descripcion: data.destino_descripcion,
+                        saldo: data.destino_saldo,
+                        saldo_descripcion: data.destino_saldo_descripcion,
+                        monto_anterior: data.destino_monto_anterior,
+                        monto_actual: data.destino_monto_nuevo,
+                        movimiento: movimientoDB._id 
+                    }
+    
+                    const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+                    await nuevaEvolucion.save();
+    
+                }
 
                 respuesta.success(res, 'Movimiento creado correctamente');
 
@@ -148,7 +185,7 @@ class Movimiento {
                 // Ordenar
                 // let ordenar = [columna || 'createdAt', direccion || -1];
 
-                 // Join con "Tipo de movimientos"
+                // Join con "Tipo de movimientos"
                  pipeline.push(
                     { $lookup: { // Lookup - Tipo movimientos
                         from: 'tipo_movimiento',
@@ -210,8 +247,38 @@ class Movimiento {
 
                 // SE CREA EL NUEVO MOVIMIENTO
                 const nuevoMovimiento = new MovimientosModel(data);
-                await nuevoMovimiento.save();
+                const movimientoDB = await nuevoMovimiento.save();
+
+                // ----- EVOLUCION DE SALDO -----
                 
+                // Origen
+                const dataEvolucionOrigen = {
+                    empresa: data.origen,
+                    empresa_descripcion: data.origen_descripcion,
+                    saldo: data.origen_saldo,
+                    saldo_descripcion: data.origen_saldo_descripcion,
+                    monto_anterior: data.origen_monto_anterior,
+                    monto_actual: data.origen_monto_nuevo,
+                    movimiento: movimientoDB._id 
+                }
+
+                const nuevaEvolucionOrigen = new EvolucionCajaModel(dataEvolucionOrigen);
+                await nuevaEvolucionOrigen.save();
+      
+                // Destino
+                const dataEvolucionDestino = {
+                    empresa: data.destino,
+                    empresa_descripcion: data.destino_descripcion,
+                    saldo: data.destino_saldo,
+                    saldo_descripcion: data.destino_saldo_descripcion,
+                    monto_anterior: data.destino_monto_anterior,
+                    monto_actual: data.destino_monto_nuevo,
+                    movimiento: movimientoDB._id 
+                }
+
+                const nuevaEvolucionDestino = new EvolucionCajaModel(dataEvolucionDestino);
+                await nuevaEvolucionDestino.save();
+               
                 // RESPUESTA API-REST
                 respuesta.success(res, 'Todo correcto');
 
@@ -292,8 +359,10 @@ class Movimiento {
                         concepto,
                         importe: chequeAnterior.importe,
                         cliente: chequeAnterior.destino,
+                        tipo_cliente: data.tipo_origen,
                         cliente_descripcion: chequeAnterior.destino_descripcion,
                         destino,
+                        tipo_destino: data.tipo_destino,
                         destino_descripcion: data.destino_descripcion
                     };
                     const nuevoCheque = new ChequeModel(dataCheque); 
@@ -303,7 +372,43 @@ class Movimiento {
 
                 // SE CREA EL MOVIMIENTO
                 const nuevoMovimiento = new MovimientosModel(data);
-                await nuevoMovimiento.save();
+                const movimientoDB = await nuevoMovimiento.save();
+
+                 // ----- EVOLUCION DE SALDO -----
+                
+                // Origen
+                if(req.body.tipo_origen === 'Interno'){
+                    const dataEvolucion = {
+                        empresa: data.origen,
+                        empresa_descripcion: data.origen_descripcion,
+                        saldo: data.origen_saldo,
+                        saldo_descripcion: data.origen_saldo_descripcion,
+                        monto_anterior: data.origen_monto_anterior,
+                        monto_actual: data.origen_monto_nuevo,
+                        movimiento: movimientoDB._id 
+                    }
+    
+                    const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+                    await nuevaEvolucion.save();
+    
+                }
+                
+                // Destino
+                if(req.body.tipo_destino === 'Interno'){
+                    const dataEvolucion = {
+                        empresa: data.destino,
+                        empresa_descripcion: data.destino_descripcion,
+                        saldo: data.destino_saldo,
+                        saldo_descripcion: data.destino_saldo_descripcion,
+                        monto_anterior: data.destino_monto_anterior,
+                        monto_actual: data.destino_monto_nuevo,
+                        movimiento: movimientoDB._id 
+                    }
+    
+                    const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+                    await nuevaEvolucion.save();
+    
+                }
                 
                 // RESPUESTA API-REST
                 respuesta.success(res, 'Todo correcto');

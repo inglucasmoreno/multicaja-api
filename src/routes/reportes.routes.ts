@@ -14,4 +14,8 @@ router.post('/movimientos', validaciones.jwt, ReportesController.movimientos);
 // POST - http://localhost:3000/api/reportes/cheques-emitidos
 router.post('/cheques-emitidos', validaciones.jwt, ReportesController.chequesEmitidos);
 
+// Saldos
+// POST - http://localhost:3000/api/reportes/saldos
+router.post('/saldos', validaciones.jwt, ReportesController.evolucionSaldo);
+
 export default router;

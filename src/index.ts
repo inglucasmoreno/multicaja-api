@@ -20,6 +20,7 @@ import MovimientosRoutes from './routes/movimientos.routes';
 import TipoMovimientoRoutes from './routes/tipo_movimiento.routes';
 import ChequesRoutes from './routes/cheque.routes';
 import ReportesRoutes from './routes/reportes.routes';
+import EvolucionCajaRoutes from './routes/evolucion_caja.routes';
 
 // [Express]
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/movimientos', MovimientosRoutes);
 app.use('/api/tipo-movimientos',TipoMovimientoRoutes); 
 app.use('/api/cheques', ChequesRoutes);
 app.use('/api/reportes', ReportesRoutes); 
+app.use('/api/evolucion-caja', EvolucionCajaRoutes); 
 
 // [Necesario para no perder las rutas en produccion]
 app.get('*', (req, res) => {
