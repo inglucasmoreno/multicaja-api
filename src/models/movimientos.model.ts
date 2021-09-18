@@ -7,6 +7,10 @@ export interface I_Movimiento extends mongoose.Document {
     tipo_origen: String,
     tipo_destino: String,
     tipo_movimiento: Schema.Types.ObjectId,
+    cuenta_contable: Schema.Types.ObjectId,
+    centro_costos: Schema.Types.ObjectId,
+    comprobantes: String,
+    concepto: String,
     origen: String,
     destino: String,
     origen_saldo: Schema.Types.ObjectId,
@@ -44,6 +48,26 @@ const movimientoSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'tipo_movimiento',
         required: 'El tipo de movimiento es un campo obligatorio'
+    },
+    cuenta_contable: {
+        type: Schema.Types.ObjectId,
+        ref: 'cuenta_contable',
+        required: 'La cuenta contable es un campo obligatorio'
+    },
+    centro_costos: {
+        type: Schema.Types.ObjectId,
+        ref: 'centro_costos',
+        required: 'El centro de costos es un campo obligatorio'
+    },
+    comprobante: {                        
+        type: String,
+        uppercase: true,
+        default: ''
+    },
+    concepto: {                          
+        type: String,
+        uppercase: true,
+        default: ''
     },
     origen: {             // ID de empresa origen              
         type: String,

@@ -23,6 +23,7 @@ import ReportesRoutes from './routes/reportes.routes';
 import EvolucionCajaRoutes from './routes/evolucion_caja.routes';
 import CentroCostosRoutes from './routes/centro_costos.routes';
 import CuentaContableRoutes from './routes/cuenta_contable.routes';
+import AlertasRoutes from './routes/alertas.routes';
 
 // [Express]
 const app = express();
@@ -45,7 +46,8 @@ app.use('/api/cheques', ChequesRoutes);
 app.use('/api/reportes', ReportesRoutes); 
 app.use('/api/evolucion-caja', EvolucionCajaRoutes); 
 app.use('/api/centro-costos', CentroCostosRoutes); 
-app.use('/api/cuenta-contable', CuentaContableRoutes); 
+app.use('/api/cuenta-contable', CuentaContableRoutes);
+app.use('/api/alertas', AlertasRoutes); 
 
 // [Necesario para no perder las rutas en produccion]
 app.get('*', (req, res) => {

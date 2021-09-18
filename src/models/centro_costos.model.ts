@@ -13,7 +13,7 @@ const centroCostosSchema = new Schema({
         type: String,
         trim: true,
         uppercase: true,
-        required: 'La descripcion del centro de costos es obligatoria'
+        requierd: 'La descripcion es obligatoria'
     },
 
     activo: {

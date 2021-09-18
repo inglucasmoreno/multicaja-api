@@ -22,6 +22,8 @@ class Reportes {
             // Fecha de creacion de movimiento
             if(desde !== null && desde !== '') {
                 const desdeNew = add(new Date(desde), { hours: 3 });
+
+                
                 pipeline.push({ $match: { createdAt: { $gte: new Date(desdeNew) } } })
             };
             
@@ -53,9 +55,30 @@ class Reportes {
                     foreignField: '_id',
                     as: 'tipo_movimiento'
                 }},
-            );
-            
+            );    
             pipeline.push({ $unwind: '$tipo_movimiento' });
+
+            // Join con "Centro de costos"
+            pipeline.push(
+                { $lookup: { // Lookup - centro_costos
+                    from: 'centro_costos',
+                    localField: 'centro_costos',
+                    foreignField: '_id',
+                    as: 'centro_costos'
+                }},
+            );
+            pipeline.push({ $unwind: '$centro_costos' });
+
+            // Join con "Cuenta contable"
+            pipeline.push(
+                { $lookup: { // Lookup - cuenta_contable
+                    from: 'cuenta_contable',
+                    localField: 'cuenta_contable',
+                    foreignField: '_id',
+                    as: 'cuenta_contable'
+                }},
+            );
+            pipeline.push({ $unwind: '$cuenta_contable' });
 
             // Ordenando datos
             const ordenar: any = {};

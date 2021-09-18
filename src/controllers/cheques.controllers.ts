@@ -84,7 +84,6 @@ class Cheque {
             const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
             await nuevaEvolucion.save();
 
-
             respuesta.success(res, 'Todo correcto');
         
         }catch(error){

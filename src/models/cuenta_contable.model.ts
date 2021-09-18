@@ -13,7 +13,7 @@ const cuentaContableSchema = new Schema({
         type: String,
         trim: true,
         uppercase: true,
-        required: 'La descripcion de la cuenta contable es obligatoria'
+        required: 'La descripcion es obligatoria'
     },
 
     activo: {

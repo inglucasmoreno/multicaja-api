@@ -61,6 +61,28 @@ class Movimiento {
                     pipeline.push({ $unwind: '$destino_saldo' });
                 }
 
+                // 5) - Join con "Centro de costos"
+                pipeline.push(
+                    { $lookup: { // Lookup - centro_costos
+                        from: 'centro_costos',
+                        localField: 'centro_costos',
+                        foreignField: '_id',
+                        as: 'centro_costos'
+                    }},
+                );
+                pipeline.push({ $unwind: '$centro_costos' });
+
+                // 6) - Join con "Cuenta contable"
+                pipeline.push(
+                    { $lookup: { // Lookup - cuenta_contable
+                        from: 'cuenta_contable',
+                        localField: 'cuenta_contable',
+                        foreignField: '_id',
+                        as: 'cuenta_contable'
+                    }},
+                );
+                pipeline.push({ $unwind: '$cuenta_contable' });
+
                 
                 const movimiento = await MovimientosModel.aggregate(pipeline);
                 
@@ -195,7 +217,7 @@ class Movimiento {
                     }},
                 );
                 pipeline.push({ $unwind: '$tipo_movimiento' });
-
+                
                 // Ordenando datos
                 const ordenar: any = {};
                 if(req.query.columna){
@@ -220,6 +242,8 @@ class Movimiento {
                 
                 const { cheque, origen_saldo, destino_saldo, fecha_cobrado } = req.body;
 
+                console.log(req.body);
+
                 // FECHAS
                 const fecha_cobrado_adaptada = add(new Date(fecha_cobrado),{hours: 3});
 
@@ -243,7 +267,7 @@ class Movimiento {
                 await SaldosModel.findByIdAndUpdate(destino_saldo, { monto: data.destino_monto_nuevo });
 
                 // ACTUALIZACION DE ESTADO DE CHEQUE
-                await ChequeModel.findByIdAndUpdate(cheque, { fecha_cobrado: fecha_cobrado_adaptada, estado: 'Cobrado', activo: false });
+                await ChequeModel.findByIdAndUpdate(cheque, { fecha_cobrado: fecha_cobrado_adaptada, estado: 'Cobrado', activo: false }, { new: true });
 
                 // SE CREA EL NUEVO MOVIMIENTO
                 const nuevoMovimiento = new MovimientosModel(data);
