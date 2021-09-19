@@ -40,13 +40,14 @@ class TipoMovimiento {
             let ordenar = [columna || 'descripcion', direccion || 1];
 
             // Ejecucion de consulta
-            const [tipos, total] = await Promise.all([
+            const [tipos, tipo_sin_especificar, total] = await Promise.all([
                 TipoMovimientoModel.find().sort([ordenar]),
+                TipoMovimientoModel.findOne({ descripcion: 'SIN ESPECIFICAR' }),
                 TipoMovimientoModel.find().countDocuments()                
             ]); 
              
             // Respuesta
-            respuesta.success(res, { tipos, total });
+            respuesta.success(res, { tipos, tipo_sin_especificar, total });
         }catch(error){
             console.log(chalk.red(error));
             respuesta.error(res, 500);

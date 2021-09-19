@@ -54,12 +54,13 @@ class CentroCostos {
                 // Ordenar
                 let ordenar = [columna || 'descripcion', direccion || 1];
                 // Ejecucion de consulta
-                const [centros, total] = yield Promise.all([
+                const [centros, centro_sin_especificar, total] = yield Promise.all([
                     centro_costos_model_1.default.find().sort([ordenar]),
+                    centro_costos_model_1.default.findOne({ descripcion: 'SIN ESPECIFICAR' }),
                     centro_costos_model_1.default.find().countDocuments()
                 ]);
                 // Respuesta
-                response_1.respuesta.success(res, { centros, total });
+                response_1.respuesta.success(res, { centros, centro_sin_especificar, total });
             }
             catch (error) {
                 console.log(chalk_1.default.red(error));

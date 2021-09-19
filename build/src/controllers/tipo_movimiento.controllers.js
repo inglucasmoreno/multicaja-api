@@ -54,12 +54,13 @@ class TipoMovimiento {
                 // Ordenar
                 let ordenar = [columna || 'descripcion', direccion || 1];
                 // Ejecucion de consulta
-                const [tipos, total] = yield Promise.all([
+                const [tipos, tipo_sin_especificar, total] = yield Promise.all([
                     tipo_movimiento_model_1.default.find().sort([ordenar]),
+                    tipo_movimiento_model_1.default.findOne({ descripcion: 'SIN ESPECIFICAR' }),
                     tipo_movimiento_model_1.default.find().countDocuments()
                 ]);
                 // Respuesta
-                response_1.respuesta.success(res, { tipos, total });
+                response_1.respuesta.success(res, { tipos, tipo_sin_especificar, total });
             }
             catch (error) {
                 console.log(chalk_1.default.red(error));

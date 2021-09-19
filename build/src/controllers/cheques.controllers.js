@@ -149,22 +149,26 @@ class Cheque {
                 }
                 // COMPLETANDO DATOS DE MOVIMIENTO
                 movimiento.cheque = nuevoChequeDB._id;
+                console.log(movimiento);
+                console.log(cheque);
                 // CREAR MOVIMIENTO
                 const nuevoMovimiento = new movimientos_model_1.default(movimiento);
                 const movimientoDB = yield nuevoMovimiento.save();
-                // EVOLUCION DE SALDO
-                // Destino
-                const dataEvolucion = {
-                    empresa: movimiento.destino,
-                    empresa_descripcion: movimiento.destino_descripcion,
-                    saldo: movimiento.destino_saldo,
-                    saldo_descripcion: movimiento.destino_saldo_descripcion,
-                    monto_anterior: movimiento.destino_monto_anterior,
-                    monto_actual: movimiento.destino_monto_nuevo,
-                    movimiento: movimientoDB._id
-                };
-                const nuevaEvolucion = new evolucion_caja_model_1.default(dataEvolucion);
-                yield nuevaEvolucion.save();
+                // ---- EVOLUCION DE SALDO ----
+                if (movimiento.tipo_destino === 'Interno') {
+                    // Destino
+                    const dataEvolucion = {
+                        empresa: movimiento.destino,
+                        empresa_descripcion: movimiento.destino_descripcion,
+                        saldo: movimiento.destino_saldo,
+                        saldo_descripcion: movimiento.destino_saldo_descripcion,
+                        monto_anterior: movimiento.destino_monto_anterior,
+                        monto_actual: movimiento.destino_monto_nuevo,
+                        movimiento: movimientoDB._id
+                    };
+                    const nuevaEvolucion = new evolucion_caja_model_1.default(dataEvolucion);
+                    yield nuevaEvolucion.save();
+                }
                 response_1.respuesta.success(res, 'Todo correcto');
             }
             catch (error) {

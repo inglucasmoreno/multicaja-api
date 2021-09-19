@@ -41,13 +41,15 @@ class CuentaContable {
             let ordenar = [columna || 'descripcion', direccion || 1];
 
             // Ejecucion de consulta
-            const [cuentasContables, total] = await Promise.all([
+            const [cuentasContables, cuenta_sin_especificar, total] = await Promise.all([
                 CuentaContableModel.find().sort([ordenar]),
+                CuentaContableModel.findOne({descripcion: 'SIN ESPECIFICAR'}),
                 CuentaContableModel.find().countDocuments()                
             ]); 
              
             // Respuesta
-            respuesta.success(res, { cuentasContables, total });
+            respuesta.success(res, { cuentasContables, cuenta_sin_especificar, total });
+
         }catch(error){
             console.log(chalk.red(error));
             respuesta.error(res, 500);

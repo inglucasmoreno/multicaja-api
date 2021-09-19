@@ -40,13 +40,14 @@ class CentroCostos {
             let ordenar = [columna || 'descripcion', direccion || 1];
 
             // Ejecucion de consulta
-            const [centros, total] = await Promise.all([
+            const [centros, centro_sin_especificar, total] = await Promise.all([
                 CentroCostosModel.find().sort([ordenar]),
+                CentroCostosModel.findOne({ descripcion: 'SIN ESPECIFICAR' }),
                 CentroCostosModel.find().countDocuments()                
             ]); 
              
             // Respuesta
-            respuesta.success(res, { centros, total });
+            respuesta.success(res, { centros, centro_sin_especificar, total });
         }catch(error){
             console.log(chalk.red(error));
             respuesta.error(res, 500);

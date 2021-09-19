@@ -159,26 +159,32 @@ class Cheque {
             // COMPLETANDO DATOS DE MOVIMIENTO
             movimiento.cheque = nuevoChequeDB._id;
             
+            console.log(movimiento);
+            console.log(cheque);
+
             // CREAR MOVIMIENTO
             const nuevoMovimiento = new MovimientoModel(movimiento);
             const movimientoDB = await nuevoMovimiento.save();
             
-            // EVOLUCION DE SALDO
+            // ---- EVOLUCION DE SALDO ----
             
-            // Destino
-            const dataEvolucion = {
-                empresa: movimiento.destino,
-                empresa_descripcion: movimiento.destino_descripcion,
-                saldo: movimiento.destino_saldo,
-                saldo_descripcion: movimiento.destino_saldo_descripcion,
-                monto_anterior: movimiento.destino_monto_anterior,
-                monto_actual: movimiento.destino_monto_nuevo,
-                movimiento: movimientoDB._id 
+            if(movimiento.tipo_destino === 'Interno'){
+
+                // Destino
+                const dataEvolucion = {
+                    empresa: movimiento.destino,
+                    empresa_descripcion: movimiento.destino_descripcion,
+                    saldo: movimiento.destino_saldo,
+                    saldo_descripcion: movimiento.destino_saldo_descripcion,
+                    monto_anterior: movimiento.destino_monto_anterior,
+                    monto_actual: movimiento.destino_monto_nuevo,
+                    movimiento: movimientoDB._id 
+                }
+    
+                const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
+                await nuevaEvolucion.save();
+
             }
-
-            const nuevaEvolucion = new EvolucionCajaModel(dataEvolucion);
-            await nuevaEvolucion.save();
-
 
             respuesta.success(res, 'Todo correcto');
         }catch(error){
