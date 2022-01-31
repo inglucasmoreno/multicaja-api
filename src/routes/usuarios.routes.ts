@@ -15,6 +15,10 @@ router.get('/:id', validaciones.jwt, UsuariosController.getUsuario);
 // Parametros: columna | direccion
 router.get('/', validaciones.jwt, UsuariosController.listarUsuarios);
 
+// Inicializar usuario
+// GET - http://localhost:3000/api/usuarios/init
+router.get('/init/admin', UsuariosController.inicializacionUsuario);
+
 // Nuevo usuario
 // POST - http://localhost:3000/api/usuarios 
 router.post('/', 
@@ -24,7 +28,6 @@ router.post('/',
                 check('apellido', 'El Apellido es obligatorio').not().isEmpty(),
                 check('nombre', 'El Nombre es obligatorio').not().isEmpty(),
                 check('password', 'El Password es obligatorio').not().isEmpty(),
-                check('email', 'El Email es obligatorio').not().isEmpty(),
                 validaciones.campos
             ], UsuariosController.nuevoUsuario);
 

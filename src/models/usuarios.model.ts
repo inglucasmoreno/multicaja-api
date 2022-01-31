@@ -5,6 +5,7 @@ export interface I_Usuario extends mongoose.Document {
     usuario: String,
     apellido: String,
     nombre: String,
+    dni: String,
     password: String,
     email: String,
     role: String,
@@ -28,6 +29,12 @@ const usuarioSchema = new Schema({
         trim: true,
     },
 
+    dni: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+
     nombre: {
         type: String,
         required: true,
@@ -43,10 +50,9 @@ const usuarioSchema = new Schema({
 
     email: {
         type: String,
-        required: true,
         trim: true,
-        uppercase: true,
-        unique: true
+        default: '',
+        lowercase: true,
     },
 
     role: {

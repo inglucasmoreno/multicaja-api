@@ -41,7 +41,7 @@ class Auth {
             const uid = req.uid; // El uid se obtiene del middleware "validar-jwt"
             const [token, usuario] = await Promise.all([
                 jsonwebtoken.generar(uid),
-                UsuarioModel.findById(uid, 'usuario apellido nombre email role activo')
+                UsuarioModel.findById(uid, 'usuario apellido nombre email role createdAt activo')
             ]);
             respuesta.success(res, {
                 token,
